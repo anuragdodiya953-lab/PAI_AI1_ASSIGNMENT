@@ -43,7 +43,31 @@ print("\nAfter Cleaning:\n", train_df.isnull().sum())
 # 👤 Member 2: Prajwal
 # Task: Feature Engineering + Encoding + Splitting
 # ==========================================
+# Feature Engineering
+for df in [train_df, test_df]:
+    df['FamilySize'] = df['SibSp'] + df['Parch'] + 1
+    df['IsAlone'] = 1
+    df.loc[df['FamilySize'] > 1, 'IsAlone'] = 0
 
+# Encoding
+train_df = pd.get_dummies(train_df, drop_first=True)
+test_df = pd.get_dummies(test_df, drop_first=True)
+
+# Align columns
+train_df, test_df = train_df.align(test_df, join='left', axis=1, fill_value=0)
+
+# Split data
+X = train_df.drop('Survived', axis=1)
+Y = train_df['Survived']
+
+X_train, X_test, Y_train, Y_test = train_test_split(
+    X, Y, test_size=0.2, random_state=42
+)
+
+# Scaling
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
 
 # ==========================================
